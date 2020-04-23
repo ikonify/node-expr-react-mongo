@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  frontend:
+    restart: always
+    stdin_open: true # This is needed to keep react stdin open
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+    ports:
+      - ${FRONTEND_EXTERNAL_PORT}:3000
+      - 35729:35729
+    networks:
+      - nginx
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    env_file: .env
+    command: npm run start
+
+  api:
+    restart: always
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_HOSTNAME=db
+    env_file: .env
+    volumes:
+      - ./api:/app
+    ports:
+      - ${API_EXTERNAL_PORT}:3000
+    networks:
+      - nginx
+    command: ./wait-for.sh db:27017 -- /app/node_modules/.bin/nodemon app.js
+
+  db:
+    image: mongo:4.2-bionic
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    volumes:
+      - ./dbdata:/data/db
+    ports:
+      - ${MONGO_DB_EXTERNAL_PORT}:27017
+    networks:
+      - nginx
+
+networks:
+  nginx:
+    driver: bridge
+
+volumes:
+  dbdata:
