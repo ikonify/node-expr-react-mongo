@@ -6,16 +6,14 @@ RUN apt-get update && \
 # Netcat is for wait-for.sh script
 RUN sudo apt-get -y install netcat
 
-RUN mkdir -p /app/node_modules && chown -R node:node /app
+RUN mkdir -p /app
 
 WORKDIR /app
 
 COPY package*.json ./
 
-USER node
+RUN npm i
 
-RUN npm install
-
-COPY --chown=node:node . .
+COPY wait-for.sh ./wait-for.sh
 
 EXPOSE 2001

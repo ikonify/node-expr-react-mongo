@@ -34,7 +34,7 @@ services:
       - ${API_EXTERNAL_PORT}:3000
     networks:
       - nginx
-    command: ./wait-for.sh db:27017 -- /app/node_modules/.bin/nodemon app.js
+    command: /bin/sh -c "/app/wait-for.sh db:27017 -- /app/node_modules/.bin/nodemon app.js"
 
   db:
     image: mongo:4.2-bionic
@@ -52,6 +52,3 @@ services:
 networks:
   nginx:
     driver: bridge
-
-volumes:
-  dbdata:

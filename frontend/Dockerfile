@@ -6,12 +6,9 @@ RUN apk update && apk upgrade
 RUN mkdir /app
 WORKDIR /app
 
-COPY package.json ./
-COPY package-lock.json ./
+COPY package*.json ./
 
 RUN npm i
 RUN npm i react-scripts@3.4.1 -g
-
-COPY . ./
 
 EXPOSE 3000
